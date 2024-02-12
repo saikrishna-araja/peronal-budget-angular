@@ -8,6 +8,7 @@ import { ArticleComponent } from './article/article.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { HttpClientModule } from '@angular/common/http';
+import { DataService } from './services/data.service';
 
 @Component({
   selector: 'pb-root',

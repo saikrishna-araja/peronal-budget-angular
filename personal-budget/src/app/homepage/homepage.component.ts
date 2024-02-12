@@ -1,17 +1,11 @@
 import { AfterContentChecked, AfterViewChecked, AfterViewInit, Component, OnInit, ViewChildren } from '@angular/core';
 import { ArticleComponent } from '../article/article.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Chart, LabelItem } from 'chart.js/auto';
+import { Chart } from 'chart.js/auto';
 import { ElementRef,ViewChild } from '@angular/core';
 import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
-import { ScaleOrdinal, scaleOrdinal } from 'd3-scale';
-import { PieArcDatum, pie, Arc, arc } from 'd3-shape';
-import * as d3interpolate from 'd3-interpolate';
-import {Transition} from 'd3-transition';
-import { DefaultArcObject } from 'd3-shape';
-import { DoughnutController } from 'chart.js/dist';
-import { APP_BASE_HREF } from '@angular/common';
 import { D3Service } from '../services/d3.service';
+import { DataService } from '../services/data.service';
 
 
 
@@ -27,7 +21,7 @@ import { D3Service } from '../services/d3.service';
 export class HomepageComponent implements AfterViewInit,OnInit{
 
   public chart:any;
-  dataSource ={datasets: [{data: [],
+  /*dataSource ={datasets: [{data: [],
                             backgroundColor: [
                                 '#ffcd56',
                                 '#ff6384',
@@ -39,35 +33,23 @@ export class HomepageComponent implements AfterViewInit,OnInit{
                             ]
                             }],
                       labels: []
-                    };
+                    }; */
 
   public chartData= [];
   public ctx:any;
   private colors: any;
   private svg: any;
-  constructor(private http:HttpClient, private element:ElementRef,private d3service:D3Service){
+  constructor(private http:HttpClient, private element:ElementRef,private d3service:D3Service,private dataService:DataService){
 
   }
   ngOnInit(): void {
-      this.http.get('http://localhost:3000/budget')
-      .subscribe((res:any) =>{
-        for (let i = 0; i < res.myBudget.length; i++) {
-          this.dataSource.datasets[0].data[i] = res.myBudget[i].budget;
-          this.dataSource.labels[i] = res.myBudget[i].title;
-
-          const budgetItem = {
-              value: res.myBudget[i].budget,
-              name: res.myBudget[i].title
-          };
-          // Add the created object to the array
-          this.chartData.push(budgetItem);
-      }
-      });
+   this.dataService.getBudgetData();
+   this.chartData= this.dataService.chartData;
   }
 
   ngAfterViewInit(): void {
     this.createChart();
-    this.createDonutChart(this.chartData);
+    this.createDonutChart(this.dataService.chartData);
   }
 
   /**
@@ -77,7 +59,7 @@ export class HomepageComponent implements AfterViewInit,OnInit{
     const ctx = this.element.nativeElement.querySelector(`#myChart`);
     this.chart = new Chart(ctx, {
         type: 'pie',
-        data: this.dataSource
+        data: this.dataService.dataSource
     });
   }
 
